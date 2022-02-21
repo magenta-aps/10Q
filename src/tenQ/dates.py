@@ -10,7 +10,7 @@ from datetime import date, timedelta
 # Due date is defined as 1st of next month plus 3 months relative to the
 # reference date. Here it is calculated by taking the first of the reference
 # month and adding four months.
-def get_due_date(reference_date):
+def get_due_date(reference_date: date):
 
     # Our resulting day should always be the 1st
     due_date = reference_date.replace(day=1)
@@ -35,7 +35,7 @@ def get_due_date(reference_date):
 
 # Last payment date is the first workday on or after the 20th in the same month
 # as the due date.
-def get_last_payment_date_from_due_date(due_date):
+def get_last_payment_date_from_due_date(due_date: date):
     # Always the 20th of same month
     result = due_date.replace(day=20)
 
@@ -48,7 +48,7 @@ def get_last_payment_date_from_due_date(due_date):
     return result
 
 
-def get_last_payment_date(reference_date):
+def get_last_payment_date(reference_date: date):
     return get_last_payment_date_from_due_date(
         get_due_date(reference_date)
     )

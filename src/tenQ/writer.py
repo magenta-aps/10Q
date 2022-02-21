@@ -58,12 +58,12 @@ class TenQTransaction(dict):
         return ''.join(fields)
 
     @staticmethod
-    def format_timestamp(datetime):
-        return '{:0%Y%m%d%H%M}'.format(datetime)
+    def format_timestamp(dt: datetime):
+        return '{:0%Y%m%d%H%M}'.format(dt)
 
     @staticmethod
-    def format_date(date):
-        return '{:%Y%m%d}'.format(date)
+    def format_date(d: date):
+        return '{:%Y%m%d}'.format(d)
 
     @staticmethod
     def format_omraade_nummer(year):
@@ -139,7 +139,7 @@ class TenQTransactionWriter(object):
     transaction_list = ''
     tax_year = None
 
-    def __init__(self, due_date, year, timestamp=None):
+    def __init__(self, due_date: date, year: int, timestamp: datetime=None):
         # Make sure due_date is on local time
         if timestamp is None:
             timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -166,7 +166,7 @@ class TenQTransactionWriter(object):
         self.transaction_24 = TenQFixWidthFieldLineTransactionType24(**init_data)
         self.transaction_26 = TenQFixWidthFieldLineTransactionType26(**init_data)
 
-    def serialize_transaction(self, cpr_nummer, amount_in_dkk, afstem_noegle, rate_text, leverandoer_ident):
+    def serialize_transaction(self, cpr_nummer: str, amount_in_dkk: int, afstem_noegle: str, rate_text: str, leverandoer_ident: str):
         data = {
             "cpr_nummer": cpr_nummer,
             "rate_beloeb": TenQTransaction.format_amount(amount_in_dkk * 100),  # Amount is in øre, so multiply by 100
