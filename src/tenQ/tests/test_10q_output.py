@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timezone
-from writer import TenQTransactionWriter
+from tenQ.writer import TenQTransactionWriter
 
 
 class OutputTest(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from dates import get_due_date, get_last_payment_date, get_last_payment_date_from_due_date
+from tenQ.dates import get_due_date, get_last_payment_date, get_last_payment_date_from_due_date
 
 
 class Test10QDateCalculation(unittest.TestCase):

@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 
-from dates import get_last_payment_date
+from tenQ.dates import get_last_payment_date
 
 
 # Temporary class for serializing transaction data in a writer
