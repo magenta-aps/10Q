@@ -8,6 +8,7 @@ src/tenQ/writer.py
 src/tenQ.egg-info/PKG-INFO
 src/tenQ.egg-info/SOURCES.txt
 src/tenQ.egg-info/dependency_links.txt
+src/tenQ.egg-info/requires.txt
 src/tenQ.egg-info/top_level.txt
 src/tenQ/tests/__init__.py
 src/tenQ/tests/test_10q_output.py
