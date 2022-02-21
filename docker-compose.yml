@@ -1,0 +1,9 @@
+version: "3.4"
+services:
+  test:
+    container_name: 10q
+    image: 10q:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: python -m unittest
