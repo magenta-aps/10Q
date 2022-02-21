@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import pytz
 
-from tenQ.dates import get_last_payment_date
+from dates import get_last_payment_date
 
 
 # Temporary class for serializing transaction data in a writer
@@ -140,16 +140,15 @@ class TenQTransactionWriter(object):
     transaction_list = ''
     tax_year = None
 
-    def __init__(self, collect_date, year, time_stamp=None):
-        # Make sure collect_date is on local time
-        if time_stamp is None:
-            time_stamp = datetime.utcnow().replace(tzinfo=pytz.utc)
+    def __init__(self, due_date, year, timestamp=None):
+        # Make sure due_date is on local time
+        if timestamp is None:
+            timestamp = datetime.utcnow().replace(tzinfo=pytz.utc)
         omraad_nummer = TenQTransaction.format_omraade_nummer(year)
-        due_date = collect_date.date()
-        last_payment_date = get_last_payment_date(collect_date)
+        last_payment_date = get_last_payment_date(due_date)
 
         init_data = {
-            'time_stamp': TenQTransaction.format_timestamp(time_stamp),
+            'time_stamp': TenQTransaction.format_timestamp(timestamp),
             'omraad_nummer': omraad_nummer,
             'paalign_aar': year,
             # Note that the names of the following two datefields have different
@@ -198,5 +197,5 @@ class TenQTransactionWriter(object):
 # tilbagebetaling = 200
 
 # # Construct the writer
-# transaction_creator = TransactionCreator(collect_date=datetime.now(), tax_year=2020)
+# transaction_creator = TransactionCreator(due_date=datetime.now(), tax_year=2020)
 # print(transaction_creator.make_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
