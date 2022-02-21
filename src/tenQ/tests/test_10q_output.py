@@ -1,6 +1,5 @@
 import unittest
-import pytz
-from datetime import datetime
+from datetime import datetime, timezone
 from writer import TenQTransactionWriter
 
 
@@ -8,9 +7,9 @@ class OutputTest(unittest.TestCase):
 
     def setUp(self):
         self.transaction_writer = TenQTransactionWriter(
-            due_date=datetime(2022, 2, 18, 12, 4, 14, tzinfo=pytz.utc),
+            due_date=datetime(2022, 2, 18, 12, 4, 14, tzinfo=timezone.utc),
             year=2022,
-            timestamp=datetime(2022, 2, 18, 12, 35, 57, tzinfo=pytz.utc)
+            timestamp=datetime(2022, 2, 18, 12, 35, 57, tzinfo=timezone.utc)
         )
 
     def test_writer_successful(self):
@@ -21,7 +20,7 @@ class OutputTest(unittest.TestCase):
             rate_text='Testing\r\nwith\r\nlines',
             leverandoer_ident='10Q',
         )
-        self.assertEquals(
+        self.assertEqual(
             prisme10Q_content,
             '\r\n'.join([
                 ' 10Q100202202181235090002220920221234567890001234567890',
@@ -42,7 +41,7 @@ class OutputTest(unittest.TestCase):
             'amount_in_dkk': 1000,
             'afstem_noegle': 'e688d6a6fc65424483819520bbbe7745',
             'rate_text': 'hephey',
-            'leverandoer_ident': 'KAS'
+            'leverandoer_ident': 'test'
         }
         too_long = {
             'cpr_nummer': '12345678901',

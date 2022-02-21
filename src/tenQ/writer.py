@@ -1,5 +1,4 @@
-from datetime import date, datetime
-import pytz
+from datetime import date, datetime, timezone
 
 from dates import get_last_payment_date
 
@@ -143,7 +142,7 @@ class TenQTransactionWriter(object):
     def __init__(self, due_date, year, timestamp=None):
         # Make sure due_date is on local time
         if timestamp is None:
-            timestamp = datetime.utcnow().replace(tzinfo=pytz.utc)
+            timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
         omraad_nummer = TenQTransaction.format_omraade_nummer(year)
         last_payment_date = get_last_payment_date(due_date)
 
