@@ -31,19 +31,21 @@ class OutputTest(unittest.TestCase):
             kontonr=1234005678,
             beløb=Decimal(123.45),
             deb_kred='D',
+            is_cvr=True,
+            ydelse_modtager=12345678
         )
         self.assertEqual(
             prismeG69_content,
-            '\r\n'.join([
-                '012G6900001003401NORFLYD'
-                '&101test'
-                '&10300123'
-                '&1040000001'
-                '&11020220311'
-                '&1111234005678'
-                '&112000000012345 '
-                '&113D',
-            ])
+            '012G6900001003401NORFLYD'
+            '&101test'
+            '&10300123'
+            '&1040000001'
+            '&11020220311'
+            '&1111234005678'
+            '&112000000012345 '
+            '&113D'
+            '&13203'
+            '&1330012345678'
         )
 
     def test_writer_invalid_input(self):

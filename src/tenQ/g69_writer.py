@@ -56,6 +56,15 @@ class G69TransactionWriter(object):
         306: ('aktivitet_nr', 10, str, False, False),
     })
 
+    # Set of required codes
+    required = set([
+        code
+        for code, config in fields.items()
+        if config[3]
+    ])
+
+    # mapping of codes with other codes that they require
+    # (if 132 is set, 133 must be as well)
     required_together = {
         132: (133,), 133: (132,),
         170: (171,), 171: (170,),
@@ -69,9 +78,18 @@ class G69TransactionWriter(object):
         306: (300, 301, 304),
     }
 
+    # mapping of codes that may not be present together
+    # (if 210 is present, neither 116 or 200 may be)
     mutually_exclusive = {
         210: (116, 200),
         211: (116, 200)
+    }
+
+    # shorthands; it's easier to remember and provide
+    # is_cvr=True than ydelse_modtager_nrkode=3
+    aliases = {
+        'is_cvr': {'field': 132, 'map': {False: 2, True: 3}},
+        'is_kontering_fakturapulje': {'field': 200, map: {False: 'N', True: 'J'}}
     }
 
     registreringssted = 0
@@ -95,6 +113,12 @@ class G69TransactionWriter(object):
         if post_type not in ('NOR', 'PRI', 'SUP'):
             raise ValueError("post_type must be NOR, PRI or SUP")
 
+        for alias, config in self.aliases.items():
+            if alias in kwargs:
+                name = self.fields[config['field']][0]
+                if kwargs[alias] in config['map']:
+                    kwargs[name] = config['map'][kwargs[alias]]
+
         # Header
         output.append(
             str(self.registreringssted).rjust(3, '0') +
@@ -106,7 +130,32 @@ class G69TransactionWriter(object):
             self.linjeformat
         )
 
-        present_fields = set()
+        present_fields = set([
+            code
+            for code, config in self.fields.items()
+            if config[0] in kwargs
+        ])
+
+        for code in self.required:
+            name = self.fields[code][0]
+            if name not in kwargs:
+                raise ValueError(f"Field {name} required")
+
+        for key, required in self.required_together.items():
+            if key in present_fields:
+                if not all([r in present_fields for r in required]):
+                    raise ValueError(
+                        f"When supplying {self.fields[key][0]}, you must also supply " +
+                        (', '.join([f'"{self.fields[r][0]}"' for r in required]))
+                    )
+
+        for key, excluded in self.mutually_exclusive.items():
+            if key in present_fields:
+                if any([e in present_fields for e in excluded]):
+                    raise ValueError(
+                        f"When supplying {self.fields[key][0]}, you may not also supply " +
+                        (', '.join([f'"{self.fields[e][0]}"' for e in excluded]))
+                    )
 
         # data
         for code, config in self.fields.items():
@@ -139,22 +188,6 @@ class G69TransactionWriter(object):
                 code = str(code).rjust(3, '0')
                 output.append(f"{code}{value}")
                 self.line_number += 1
-
-        for key, required in self.required_together.items():
-            if key in present_fields:
-                if not all([r in present_fields for r in required]):
-                    raise ValueError(
-                        f"When supplying {self.fields[key][0]}, you must also supply " +
-                        (', '.join([f'"{self.fields[r][0]}"' for r in required]))
-                    )
-
-        for key, excluded in self.mutually_exclusive.items():
-            if key in present_fields:
-                if any([e in present_fields for e in excluded]):
-                    raise ValueError(
-                        f"When supplying {self.fields[key][0]}, you may not also supply " +
-                        (', '.join([f'"{self.fields[e][0]}"' for e in excluded]))
-                    )
         return '&'.join(output)
 
     def serialize_transaction_pair(self, post_type, **kwargs):
