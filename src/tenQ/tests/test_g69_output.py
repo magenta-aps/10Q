@@ -63,7 +63,6 @@ class OutputTest(unittest.TestCase):
                             key: invalid_value,
                         })
 
-
     def test_writer_required_together(self):
         data = (
             {'ydelse_modtager_nrkode': 3, 'ydelse_modtager': 3},

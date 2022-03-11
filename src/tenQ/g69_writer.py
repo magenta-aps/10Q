@@ -97,8 +97,10 @@ class G69TransactionWriter(object):
     organisationsenhed = 0
     organisationstype = 1
     linjeformat = 'FLYD'
-    line_number = 1  # Line number in the file; successive calls to serialize_transaction increment this.
-                     # Be sure to use a new G69TransactionWriter or reset the line number when writing a new file
+
+    # Line number in the file; successive calls to serialize_transaction increment this.
+    # Be sure to use a new G69TransactionWriter or reset the line number when writing a new file
+    line_number = 1
 
     def __init__(self, registreringssted: int, organisationsenhed: int):
         self.registreringssted = registreringssted
@@ -121,13 +123,15 @@ class G69TransactionWriter(object):
 
         # Header
         output.append(
-            str(self.registreringssted).rjust(3, '0') +
-            self.snitfladetype +
-            str(self.line_number).rjust(5, '0') +
-            str(self.organisationsenhed).rjust(4, '0') +
-            str(self.organisationstype).rjust(2, '0') +
-            post_type +
-            self.linjeformat
+            ''.join([
+                str(self.registreringssted).rjust(3, '0'),
+                self.snitfladetype,
+                str(self.line_number).rjust(5, '0'),
+                str(self.organisationsenhed).rjust(4, '0'),
+                str(self.organisationstype).rjust(2, '0'),
+                post_type,
+                self.linjeformat
+            ])
         )
 
         present_fields = set([
