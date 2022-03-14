@@ -207,89 +207,89 @@ class G69TransactionWriter(object):
     numeric = 2
     amount = 3
     fields = OrderedDict({
-        # id: (name, width, type, required, pad)
-        101: ('kaldenavn', 10, str, False, False),
-        102: ('afstemningsenhed', 5, str, False, False),
-        103: ('maskinnr', 5, int, True, True),
-        104: ('eks_løbenr', 7, int, True, True),
-        110: ('post_dato', 8, date, True, True),
-        111: ('kontonr', 10, int, True, True),
-        112: ('beløb', 13, Decimal, True, True),
-        113: ('deb_kred', 1, str, True, False),
-        114: ('regnskabsår', 4, int, False, True),
-        116: ('bilag_arkiv_nr', 255, str, False, False),
-        117: ('udbet_henv_nr', 20, int, False, False),
-        118: ('valør_dato', 8, date, False, False),
-        130: ('betaling_modtager_nrkode', 2, int, False, True),
-        131: ('betaling_modtager', 10, int, False, True),
-        132: ('ydelse_modtager_nrkode', 2, int, False, True),
-        133: ('ydelse_modtager', 10, int, False, True),
-        134: ('oplysningspligtig_nrkode', 2, int, False, True),
-        135: ('oplysningspligtig', 10, int, False, True),
-        136: ('oplysningspligt_kode', 1, str, False, False),
-        150: ('postering_udtrækstekst_1', 5, str, False, False),
-        151: ('postering_udtrækstekst_2', 5, str, False, False),
-        152: ('postering_udtrækskode', 5, str, False, False),
-        153: ('posteringstekst', 35, str, False, False),
-        170: ('rekvisitionsnr', 10, int, False, True),
-        171: ('delleverance', 1, str, False, False),
-        180: ('bærer', 10, str, False, False),
-        181: ('afdeling', 10, str, False, False),
-        182: ('formål', 10, str, False, False),
-        185: ('omvendt_betalingspligt', 2, int, False, True),
-        200: ('kontering_fakturapulje', 1, str, False, False),
-        201: ('konteret_af', 5, str, False, False),
-        202: ('notat_short', 200, str, False, False),
-        203: ('attesteret_af', 5, str, False, False),
-        210: ('emne', 60, str, False, False),
-        211: ('notat_long', 1024, str, False, False),
-        250: ('ekstern_reference', 20, str, False, False),
-        251: ('iris_nr', 20, str, False, False),
-        300: ('projekt_nr', 20, str, False, False),
-        301: ('projekt_art', 10, str, False, False),
-        302: ('prisme_medarbejder', 10, str, False, False),
-        303: ('salgspris', 13, Decimal, False, False),
-        304: ('antal', 10, Decimal, False, False),
-        305: ('linje_egenskab', 10, str, False, False),
-        306: ('aktivitet_nr', 10, str, False, False),
+        # name: (id, width, type, required, pad)
+        'kaldenavn': (101, 10, str, False, False),
+        'afstemningsenhed': (102, 5, str, False, False),
+        'maskinnr': (103, 5, int, True, True),
+        'eks_løbenr': (104, 7, int, True, True),
+        'post_dato': (110, 8, date, True, True),
+        'kontonr': (111, 10, int, True, True),
+        'beløb': (112, 13, Decimal, True, True),
+        'deb_kred': (113, 1, str, True, False),
+        'regnskabsår': (114, 4, int, False, True),
+        'bilag_arkiv_nr': (116, 255, str, False, False),
+        'udbet_henv_nr': (117, 20, int, False, False),
+        'valør_dato': (118, 8, date, False, False),
+        'betaling_modtager_nrkode': (130, 2, int, False, True),
+        'betaling_modtager': (131, 10, int, False, True),
+        'ydelse_modtager_nrkode': (132, 2, int, False, True),
+        'ydelse_modtager': (133, 10, int, False, True),
+        'oplysningspligtig_nrkode': (134, 2, int, False, True),
+        'oplysningspligtig': (135, 10, int, False, True),
+        'oplysningspligt_kode': (136, 1, str, False, False),
+        'postering_udtrækstekst_1': (150, 5, str, False, False),
+        'postering_udtrækstekst_2': (151, 5, str, False, False),
+        'postering_udtrækskode': (152, 5, str, False, False),
+        'posteringstekst': (153, 35, str, False, False),
+        'rekvisitionsnr': (170, 10, int, False, True),
+        'delleverance': (171, 1, str, False, False),
+        'bærer': (180, 10, str, False, False),
+        'afdeling': (181, 10, str, False, False),
+        'formål': (182, 10, str, False, False),
+        'omvendt_betalingspligt': (185, 2, int, False, True),
+        'kontering_fakturapulje': (200, 1, str, False, False),
+        'konteret_af': (201, 5, str, False, False),
+        'notat_short': (202, 200, str, False, False),
+        'attesteret_af': (203, 5, str, False, False),
+        'emne': (210, 60, str, False, False),
+        'notat_long': (211, 1024, str, False, False),
+        'ekstern_reference': (250, 20, str, False, False),
+        'iris_nr': (251, 20, str, False, False),
+        'projekt_nr': (300, 20, str, False, False),
+        'projekt_art': (301, 10, str, False, False),
+        'prisme_medarbejder': (302, 10, str, False, False),
+        'salgspris': (303, 13, Decimal, False, False),
+        'antal': (304, 10, Decimal, False, False),
+        'linje_egenskab': (305, 10, str, False, False),
+        'aktivitet_nr': (306, 10, str, False, False),
     })
 
     # Set of required codes
     required = set([
-        code
-        for code, config in fields.items()
+        name
+        for name, config in fields.items()
         if config[3]
     ])
 
     # mapping of codes with other codes that they require
     # (if 132 is set, 133 must be as well)
     required_together = {
-        132: (133,), 133: (132,),
-        170: (171,), 171: (170,),
-        210: (211,), 211: (210,),
-        300: (301, 304),
-        301: (300, 304),
-        302: (300, 301, 304),
-        303: (300, 301, 304),
-        304: (300, 301),
-        305: (300, 301, 304),
-        306: (300, 301, 304),
+        'ydelse_modtager_nrkode': ('ydelse_modtager',), 'ydelse_modtager': ('ydelse_modtager_nrkode',),
+        'rekvisitionsnr': ('delleverance',), 'delleverance': ('rekvisitionsnr',),
+        'emne': ('notat_long',), 'notat_long': ('emne',),
+        'projekt_nr': ('projekt_art', 'antal'),
+        'projekt_art': ('projekt_nr', 'antal'),
+        'prisme_medarbejder': ('projekt_nr', 'projekt_art', 'antal'),
+        'salgspris': ('projekt_nr', 'projekt_art', 'antal'),
+        'antal': ('projekt_nr', 'projekt_art'),
+        'linje_egenskab': ('projekt_nr', 'projekt_art', 'antal'),
+        'aktivitet_nr': ('projekt_nr', 'projekt_art', 'antal'),
     }
 
     # mapping of codes that may not be present together
     # (if 210 is present, neither 116 or 200 may be)
     mutually_exclusive = {
-        210: (116, 200),
-        211: (116, 200)
+        'emne': ('bilag_arkiv_nr', 'kontering_fakturapulje'),
+        'notat_long': ('bilag_arkiv_nr', 'kontering_fakturapulje')
     }
 
     # shorthands; it's easier to remember and provide
     # is_cvr=True than ydelse_modtager_nrkode=3
     aliases = {
-        'is_cvr': {'field': 132, 'map': {False: 2, True: 3}},
-        'is_kontering_fakturapulje': {'field': 200, map: {False: 'N', True: 'J'}},
-        'is_debet': {'field': 113, 'map': {False: 'K', True: 'D'}},
-        'is_kredit': {'field': 113, 'map': {False: 'D', True: 'K'}},
+        'is_cvr': {'field': 'ydelse_modtager_nrkode', 'map': {False: 2, True: 3}},
+        'is_kontering_fakturapulje': {'field': 'kontering_fakturapulje', map: {False: 'N', True: 'J'}},
+        'is_debet': {'field': 'deb_kred', 'map': {False: 'K', True: 'D'}},
+        'is_kredit': {'field': 'deb_kred', 'map': {False: 'D', True: 'K'}},
     }
 
     registreringssted = 0
@@ -317,7 +317,7 @@ class G69TransactionWriter(object):
 
         for alias, config in self.aliases.items():
             if alias in kwargs:
-                name = self.fields[config['field']][0]
+                name = config['field']
                 if kwargs[alias] in config['map']:
                     kwargs[name] = config['map'][kwargs[alias]]
 
@@ -334,41 +334,29 @@ class G69TransactionWriter(object):
             ])
         )
 
-        present_fields = set([
-            code
-            for code, config in self.fields.items()
-            if config[0] in kwargs
-        ])
+        present_fields = set([name for name in self.fields if name in kwargs])
 
-        for code in self.required:
-            name = self.fields[code][0]
+        for name in self.required:
             if name not in kwargs:
                 raise ValueError(f"Field {name} required")
 
-        for key, required in self.required_together.items():
-            if key in present_fields:
+        for name, required in self.required_together.items():
+            if name in present_fields:
                 if not all([r in present_fields for r in required]):
-                    raise ValueError(''.join([
-                        f"When supplying {self.fields[key][0]}, you must also supply ",
-                        (', '.join([f'"{self.fields[r][0]}"' for r in required]))
-                    ]))
+                    raise ValueError(f"When supplying {name}, you must also supply " + (', '.join(required)))
 
-        for key, excluded in self.mutually_exclusive.items():
-            if key in present_fields:
+        for name, excluded in self.mutually_exclusive.items():
+            if name in present_fields:
                 if any([e in present_fields for e in excluded]):
-                    raise ValueError(''.join([
-                        f"When supplying {self.fields[key][0]}, you may not also supply ",
-                        (', '.join([f'"{self.fields[e][0]}"' for e in excluded]))
-                    ]))
+                    raise ValueError(f"When supplying {name}, you may not also supply " + (', '.join(excluded)))
 
         # data
-        for code, config in self.fields.items():
-            (name, width, required_type, required, pad) = config
+        for name, config in self.fields.items():
+            (code, width, required_type, required, pad) = config
             if name not in kwargs:
                 if required:
                     raise KeyError(name)
             else:
-                present_fields.add(code)
                 value = kwargs[name]
                 if type(value) != required_type:
                     if required_type == Decimal and type(value) == int:
