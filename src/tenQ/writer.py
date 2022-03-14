@@ -141,9 +141,11 @@ class TenQTransactionWriter(object):
     transaction_list = ''
     tax_year = None
 
-    def __init__(self, due_date: date, year: int, timestamp: datetime = None):
+    def __init__(self, due_date: date, year: int, timestamp: datetime = None, creation_date: date = None):
         if timestamp is None:
             timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
+        if creation_date is None:
+            creation_date = due_date
         omraad_nummer = TenQTransaction.format_omraade_nummer(year)
         last_payment_date = get_last_payment_date(due_date)
 
@@ -158,7 +160,7 @@ class TenQTransactionWriter(object):
             'forfald_dato': TenQTransaction.format_date(due_date),
             'betal_dato': TenQTransaction.format_date(last_payment_date),
             'rentefri_dato': TenQTransaction.format_date(last_payment_date),
-            'stiftelse_dato': TenQTransaction.format_date(due_date),
+            'stiftelse_dato': TenQTransaction.format_date(creation_date),
             'fra_periode': TenQTransaction.format_date(date(year=year, month=1, day=1)),
             'til_periode': TenQTransaction.format_date(date(year=year, month=12, day=31)),
         }
