@@ -22,7 +22,7 @@ class OutputTest(unittest.TestCase):
         self.transaction_writer = G69TransactionWriter(12, 34)
 
     def test_writer_successful(self):
-        prismeG69_content = self.transaction_writer.serialize_transaction(
+        prismeG69_content_1 = self.transaction_writer.serialize_transaction(
             post_type='NOR',
             kaldenavn='test',
             maskinnr=123,
@@ -34,8 +34,20 @@ class OutputTest(unittest.TestCase):
             is_cvr=True,
             ydelse_modtager=12345678
         )
+        prismeG69_content_2 = self.transaction_writer.serialize_transaction(
+            post_type='NOR',
+            kaldenavn='test',
+            maskinnr=123,
+            eks_løbenr=1,
+            post_dato=date(2022, 3, 11),
+            kontonr=1234005678,
+            beløb=Decimal(123.45),
+            deb_kred='K',
+            is_cvr=True,
+            ydelse_modtager=12345678
+        )
         self.assertEqual(
-            prismeG69_content,
+            prismeG69_content_1,
             '012G6900001003401NORFLYD'
             '&101test'
             '&10300123'
@@ -44,6 +56,19 @@ class OutputTest(unittest.TestCase):
             '&1111234005678'
             '&112000000012345 '
             '&113D'
+            '&13203'
+            '&1330012345678'
+        )
+        self.assertEqual(
+            prismeG69_content_2,
+            '012G6900002003401NORFLYD'
+            '&101test'
+            '&10300123'
+            '&1040000001'
+            '&11020220311'
+            '&1111234005678'
+            '&112000000012345 '
+            '&113K'
             '&13203'
             '&1330012345678'
         )

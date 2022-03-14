@@ -262,7 +262,7 @@ class G69TransactionWriter(object):
     ])
 
     # mapping of codes with other codes that they require
-    # (if 132 is set, 133 must be as well)
+    # (if ydelse_modtager_nrkode is set, ydelse_modtager must be as well)
     required_together = {
         'ydelse_modtager_nrkode': ('ydelse_modtager',), 'ydelse_modtager': ('ydelse_modtager_nrkode',),
         'rekvisitionsnr': ('delleverance',), 'delleverance': ('rekvisitionsnr',),
@@ -277,7 +277,7 @@ class G69TransactionWriter(object):
     }
 
     # mapping of codes that may not be present together
-    # (if 210 is present, neither 116 or 200 may be)
+    # (if emne is present, neither bilag_arkiv_nr or kontering_fakturapulje may be)
     mutually_exclusive = {
         'emne': ('bilag_arkiv_nr', 'kontering_fakturapulje'),
         'notat_long': ('bilag_arkiv_nr', 'kontering_fakturapulje')
@@ -379,7 +379,7 @@ class G69TransactionWriter(object):
                     value = value.rjust(width, '0')
                 code = str(code).rjust(3, '0')
                 output.append(f"{code}{value}")
-                self.line_number += 1
+        self.line_number += 1
         return '&'.join(output)
 
     def serialize_transaction_pair(self, post_type: str = 'NOR', **kwargs):
