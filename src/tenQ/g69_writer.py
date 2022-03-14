@@ -89,7 +89,9 @@ class G69TransactionWriter(object):
     # is_cvr=True than ydelse_modtager_nrkode=3
     aliases = {
         'is_cvr': {'field': 132, 'map': {False: 2, True: 3}},
-        'is_kontering_fakturapulje': {'field': 200, map: {False: 'N', True: 'J'}}
+        'is_kontering_fakturapulje': {'field': 200, map: {False: 'N', True: 'J'}},
+        'is_debet': {'field': 113, 'map': {False: 'K', True: 'D'}},
+        'is_kredit': {'field': 113, 'map': {False: 'D', True: 'K'}},
     }
 
     registreringssted = 0
@@ -148,18 +150,18 @@ class G69TransactionWriter(object):
         for key, required in self.required_together.items():
             if key in present_fields:
                 if not all([r in present_fields for r in required]):
-                    raise ValueError(
-                        f"When supplying {self.fields[key][0]}, you must also supply " +
+                    raise ValueError(''.join([
+                        f"When supplying {self.fields[key][0]}, you must also supply ",
                         (', '.join([f'"{self.fields[r][0]}"' for r in required]))
-                    )
+                    ]))
 
         for key, excluded in self.mutually_exclusive.items():
             if key in present_fields:
                 if any([e in present_fields for e in excluded]):
-                    raise ValueError(
-                        f"When supplying {self.fields[key][0]}, you may not also supply " +
+                    raise ValueError(''.join([
+                        f"When supplying {self.fields[key][0]}, you may not also supply ",
                         (', '.join([f'"{self.fields[e][0]}"' for e in excluded]))
-                    )
+                    ]))
 
         # data
         for code, config in self.fields.items():
