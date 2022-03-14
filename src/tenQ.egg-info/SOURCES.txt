@@ -4,8 +4,7 @@ setup.cfg
 src/tenQ/__init__.py
 src/tenQ/client.py
 src/tenQ/dates.py
-src/tenQ/g69_writer.py
-src/tenQ/tenq_writer.py
+src/tenQ/writer.py
 src/tenQ.egg-info/PKG-INFO
 src/tenQ.egg-info/SOURCES.txt
 src/tenQ.egg-info/dependency_links.txt

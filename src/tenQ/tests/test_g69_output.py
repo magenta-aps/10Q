@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 from decimal import Decimal
 
-from tenQ.g69_writer import G69TransactionWriter
+from tenQ.writer import G69TransactionWriter
 
 
 class OutputTest(unittest.TestCase):
