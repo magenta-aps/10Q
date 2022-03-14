@@ -111,7 +111,7 @@ class G69TransactionWriter(object):
     def reset_line_number(self):
         self.line_number = 1
 
-    def serialize_transaction(self, post_type, **kwargs):
+    def serialize_transaction(self, post_type='NOR', **kwargs):
         output = []
         post_type = post_type.upper()
         if post_type not in ('NOR', 'PRI', 'SUP'):
