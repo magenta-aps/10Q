@@ -7,6 +7,7 @@ from decimal import Decimal
 
 # Temporary class for serializing transaction data in a writer
 # Uses KMD GE550010Q v 15
+# Eller se online dokumentation https://aka.nanoq.gl/etaxOIO/FileFormats/Prisme/10Q.aspx
 class TenQTransaction(dict):
 
     fieldspec = (
@@ -73,8 +74,14 @@ class TenQTransaction(dict):
 
     @staticmethod
     def format_amount(amount):
+        # amount angives i ører og fortegn angives som sidte karakter
         sign = '-' if amount < 0 else '+'
         return str(abs(amount)).rjust(10, '0') + sign
+
+    @staticmethod
+    def format_nummer(nummer, width):
+        # Efter aftale anvendes skatteaaret som omraadenummer
+        return str(nummer).rjust(width, '0')
 
     def __str__(self):
         return str(self.get_data())
@@ -139,18 +146,31 @@ class TenQTransactionWriter(object):
     transaction_24 = None
     transaction_26 = None
     transaction_list = ''
-    tax_year = None
 
-    def __init__(self, due_date: date, year: int, timestamp: datetime = None, creation_date: date = None):
+    def __init__(self, due_date: date, year: int, leverandoer_ident: str, timestamp: datetime = None,
+                 periode_fra: date = None, periode_til: date = None, creation_date: date = None,
+                 faktura_no: str = None, bruger_nummer: str = None, betal_art: str = None,
+                 ):
         if timestamp is None:
             timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
         if creation_date is None:
             creation_date = due_date
+        if periode_fra is None:
+            periode_fra = date(year=year, month=1, day=1)
+        if periode_til is None:
+            periode_til = date(year=year, month=12, day=31)
+        if bruger_nummer is None:
+            bruger_nummer = '0900'
+        if betal_art is None:
+            betal_art = 209
+        if faktura_no is None:
+            faktura_no = ''
         omraad_nummer = TenQTransaction.format_omraade_nummer(year)
         last_payment_date = get_last_payment_date(due_date)
 
         init_data = {
             'time_stamp': TenQTransaction.format_timestamp(timestamp),
+            "leverandoer_ident": leverandoer_ident,
             'omraad_nummer': omraad_nummer,
             'paalign_aar': year,
             # Note that the names of the following two datefields have different
@@ -161,20 +181,31 @@ class TenQTransactionWriter(object):
             'betal_dato': TenQTransaction.format_date(last_payment_date),
             'rentefri_dato': TenQTransaction.format_date(last_payment_date),
             'stiftelse_dato': TenQTransaction.format_date(creation_date),
-            'fra_periode': TenQTransaction.format_date(date(year=year, month=1, day=1)),
-            'til_periode': TenQTransaction.format_date(date(year=year, month=12, day=31)),
+            'fra_periode': TenQTransaction.format_date(periode_fra),
+            'til_periode': TenQTransaction.format_date(periode_til),
+            'faktura_no': faktura_no,
+            'bruger_nummer': bruger_nummer,
+            'betal_art': betal_art,
         }
 
         self.transaction_10 = TenQFixWidthFieldLineTransactionType10(**init_data)
         self.transaction_24 = TenQFixWidthFieldLineTransactionType24(**init_data)
         self.transaction_26 = TenQFixWidthFieldLineTransactionType26(**init_data)
 
-    def serialize_transaction(self, cpr_nummer: str, amount_in_dkk: int, afstem_noegle: str, rate_text: str, leverandoer_ident: str):
+    def serialize_transaction(self,
+                              cpr_nummer: str, amount_in_dkk: int, afstem_noegle: str, rate_text: str,
+                              sag_nummer: int = 0, individ_type: int = 20, rate_nummer: int = 999, belob_type: int = 1,
+                              rentefri_beloeb: int = 0, opkraev_kode: int = 1):
         data = {
             "cpr_nummer": cpr_nummer,
             "rate_beloeb": TenQTransaction.format_amount(amount_in_dkk * 100),  # Amount is in øre, so multiply by 100
             'afstem_noegle': afstem_noegle,
-            "leverandoer_ident": leverandoer_ident,
+            'sag_nummer': TenQTransaction.format_nummer(sag_nummer, 2),
+            'individ_type': TenQTransaction.format_nummer(individ_type, 2),
+            'rate_nummer': TenQTransaction.format_nummer(rate_nummer, 3),
+            'belob_type': belob_type,
+            'rentefri_beloeb': TenQTransaction.format_amount(rentefri_beloeb),
+            'opkraev_kode': opkraev_kode,
         }
         # Initial two lines
         result_lines = [
@@ -199,8 +230,8 @@ class TenQTransactionWriter(object):
 # tilbagebetaling = 200
 
 # # Construct the writer
-# transaction_creator = TransactionCreator(due_date=datetime.now(), tax_year=2020)
-# print(transaction_creator.make_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
+# transaction_creator = TenQTransactionWriter(due_date=datetime.now(), year=2020)
+# print(transaction_creator.serialize_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
 
 
 '''
