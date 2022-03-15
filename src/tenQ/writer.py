@@ -234,7 +234,6 @@ class TenQTransactionWriter(object):
 # print(transaction_creator.serialize_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
 
 
-
 class G69TransactionWriter(object):
     '''
     Writer for G69 transactions
