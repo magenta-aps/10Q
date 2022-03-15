@@ -203,6 +203,10 @@ class TenQTransactionWriter(object):
 # print(transaction_creator.make_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
 
 
+'''
+Writer for G69 transactions
+See doc at https://aka.nanoq.gl/etaxOIO/FileFormats/Prisme/G69.aspx
+'''
 class G69TransactionWriter(object):
 
     alphanum = 1
