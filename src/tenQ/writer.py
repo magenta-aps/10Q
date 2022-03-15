@@ -234,12 +234,12 @@ class TenQTransactionWriter(object):
 # print(transaction_creator.serialize_transaction(cpr_nummer=cpr_nummer, rate_beloeb=tilbagebetaling, afstem_noegle=afstem_noegle))
 
 
-'''
-Writer for G69 transactions
-See doc at https://aka.nanoq.gl/etaxOIO/FileFormats/Prisme/G69.aspx
-'''
-class G69TransactionWriter(object):
 
+class G69TransactionWriter(object):
+    '''
+    Writer for G69 transactions
+    See doc at https://aka.nanoq.gl/etaxOIO/FileFormats/Prisme/G69.aspx
+    '''
     alphanum = 1
     numeric = 2
     amount = 3
