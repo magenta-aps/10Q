@@ -1,19 +1,21 @@
 from io import IOBase
-import pysftp
 from typing import Callable
 from ftplib import all_errors as all_ftp_errors
 
+import pysftp
+from ftplib import all_errors as all_ftp_errors
+from io import IOBase
+from typing import Callable
+
+import pysftp
+
 
 class ClientException(Exception):
-    inner = None
-
-    def __init__(self, exception):
-        self.inner = exception
-        super().__init__(exception.message)
-
+    pass
 
 # To tunnel to the real ftp server:
 # ssh -L 172.17.0.1:2222:sftp.erp.gl:22 [your_username]@10.240.76.76
+
 
 def put_file_in_prisme_folder(settings, source_file_name_or_object, destination_folder: str, destination_filename: str = None, callback: Callable[[int, int], None] = None):
     try:
@@ -32,4 +34,4 @@ def put_file_in_prisme_folder(settings, source_file_name_or_object, destination_
             else:
                 raise TypeError(f"file_path_or_object (type={type(source_file_name_or_object)}) not recognized")
     except all_ftp_errors as e:
-        raise ClientException(e)
+        raise ClientException(str(e)) from e
