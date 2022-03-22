@@ -1,8 +1,8 @@
+from collections import OrderedDict
 from datetime import date, datetime, timezone
+from decimal import Decimal
 
 from tenQ.dates import get_last_payment_date
-from collections import OrderedDict
-from decimal import Decimal
 
 
 # Temporary class for serializing transaction data in a writer
@@ -74,7 +74,7 @@ class TenQTransaction(dict):
 
     @staticmethod
     def format_amount(amount):
-        # amount angives i ører og fortegn angives som sidte karakter
+        # amount angives i ører og fortegn angives som sidste karakter
         sign = '-' if amount < 0 else '+'
         return str(abs(amount)).rjust(10, '0') + sign
 
