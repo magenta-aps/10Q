@@ -1,8 +1,3 @@
-from io import IOBase
-from typing import Callable
-from ftplib import all_errors as all_ftp_errors
-
-import pysftp
 from ftplib import all_errors as all_ftp_errors
 from io import IOBase
 from typing import Callable
