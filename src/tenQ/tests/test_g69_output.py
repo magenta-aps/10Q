@@ -28,7 +28,7 @@ class OutputTest(unittest.TestCase):
             maskinnr=123,
             eks_løbenr=1,
             post_dato=date(2022, 3, 11),
-            kontonr=1234005678,
+            kontonr=123456789012345,
             beløb=Decimal(123.45),
             deb_kred='D',
             is_cvr=True,
@@ -40,7 +40,7 @@ class OutputTest(unittest.TestCase):
             maskinnr=123,
             eks_løbenr=1,
             post_dato=date(2022, 3, 11),
-            kontonr=1234005678,
+            kontonr=123456789012345,
             beløb=Decimal(123.45),
             deb_kred='K',
             is_cvr=True,
@@ -53,7 +53,7 @@ class OutputTest(unittest.TestCase):
             '&10300123'
             '&1040000001'
             '&11020220311'
-            '&1111234005678'
+            '&111123456789012345'
             '&112000000012345 '
             '&113D'
             '&13203'
@@ -66,7 +66,7 @@ class OutputTest(unittest.TestCase):
             '&10300123'
             '&1040000001'
             '&11020220311'
-            '&1111234005678'
+            '&111123456789012345'
             '&112000000012345 '
             '&113K'
             '&13203'

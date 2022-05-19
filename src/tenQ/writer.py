@@ -255,7 +255,7 @@ class G69TransactionWriter(object):
         'maskinnr': (103, 5, int, True, True),
         'eks_løbenr': (104, 7, int, True, True),
         'post_dato': (110, 8, date, True, True),
-        'kontonr': (111, 10, int, True, True),
+        'kontonr': (111, 15, int, True, True),
         'beløb': (112, 13, Decimal, True, True),
         'deb_kred': (113, 1, str, True, False),
         'regnskabsår': (114, 4, int, False, True),
