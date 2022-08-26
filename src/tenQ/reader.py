@@ -15,7 +15,7 @@ trans_type_map = {
 }
 
 
-def read_10q_file(filename:str) -> List[Dict]:
+def read_10q_file(filename: str) -> List[Dict]:
 
     with open(filename, "r") as fp:
         line_no = 1
@@ -56,7 +56,7 @@ def read_10q_file(filename:str) -> List[Dict]:
     return all_line_data
 
 
-def save_to_excel(data:List[Dict], filename:str):
+def save_to_excel(data: List[Dict], filename: str):
 
     # Convert dicts' keys into a list of headers, with 10q_line_no first
     headers_dict = {'10q_line_no': True}
