@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from tenQ.dates import get_last_payment_date
+from tenQ.dates import get_last_payment_date_from_due_date
 
 
 # Temporary class for serializing transaction data in a writer
@@ -168,7 +168,7 @@ class TenQTransactionWriter(object):
             faktura_no = ''
         omraad_nummer = TenQTransaction.format_omraade_nummer(year)
         if last_payment_date is None:
-            last_payment_date = get_last_payment_date(due_date)
+            last_payment_date = get_last_payment_date_from_due_date(due_date)
         if opkraev_date is None:
             opkraev_date = last_payment_date
         if interest_date is None:
