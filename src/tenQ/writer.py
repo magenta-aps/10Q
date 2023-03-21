@@ -29,6 +29,14 @@ class TenQTransaction(dict):
             self[field_name] = kwargs.get(field_name, default)
         self['trans_type'] = self.trans_type
 
+    def parse(self, line):
+        data = {}
+        pos = 0
+        for name, length, default in self.fieldspec:
+            data[name] = line[pos:pos+length]
+            pos += length
+        return data
+
     def serialize_transaction(self, **kwargs):
 
         data = {**self}
@@ -199,6 +207,21 @@ class TenQTransactionWriter(object):
         self.transaction_10 = TenQFixWidthFieldLineTransactionType10(**init_data)
         self.transaction_24 = TenQFixWidthFieldLineTransactionType24(**init_data)
         self.transaction_26 = TenQFixWidthFieldLineTransactionType26(**init_data)
+
+        self.transaction_map = {
+            "10":self.transaction_10,
+            "24":self.transaction_24,
+            "26":self.transaction_26,
+        }
+
+    def parse(self, text):
+        data = []
+        for line in text.split("\r\n"):
+            line_type = line[4:6]
+            transaction_object = self.transaction_map.get(line[4:6])
+            if transaction_object:
+                data.append(transaction_object.parse(line))
+        return data
 
     def serialize_transaction(self,
                               cpr_nummer: str, amount_in_dkk: int, afstem_noegle: str, rate_text: str,
