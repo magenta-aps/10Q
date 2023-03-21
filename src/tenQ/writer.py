@@ -37,6 +37,8 @@ class TenQTransaction(dict):
         data['debitor_nummer'] = data['cpr_nummer']
         data['person_nummer'] = data['cpr_nummer']
 
+        print(data)
+
         fields = []
 
         for field_name, width, _ in self.fieldspec:
