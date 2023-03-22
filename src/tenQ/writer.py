@@ -215,7 +215,6 @@ class TenQTransactionWriter(object):
     def parse(self, text):
         data = []
         for line in text.split("\r\n"):
-            line_type = line[4:6]
             transaction_object = self.transaction_map.get(line[4:6])
             if transaction_object:
                 data.append(transaction_object.parse(line))
