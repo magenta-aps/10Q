@@ -207,9 +207,9 @@ class TenQTransactionWriter(object):
         self.transaction_26 = TenQFixWidthFieldLineTransactionType26(**init_data)
 
         self.transaction_map = {
-            "10":self.transaction_10,
-            "24":self.transaction_24,
-            "26":self.transaction_26,
+            "10": self.transaction_10,
+            "24": self.transaction_24,
+            "26": self.transaction_26,
         }
 
     def parse(self, text):
