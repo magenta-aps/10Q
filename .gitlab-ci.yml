@@ -4,7 +4,7 @@ stages:
   - test
 
 variables:
-  IMAGE_DEV: ${CI_REGISTRY_IMAGE}:dev
+  IMAGE_DEV: ${CI_REGISTRY_IMAGE}:develop
 
 
 # Lint stage
