@@ -57,7 +57,7 @@ class OutputTest(unittest.TestCase):
             '&112000000012345 '
             '&113D'
             '&13203'
-            '&1330012345678'
+            '&13312345678'
         )
         self.assertEqual(
             prismeG69_content_2,
@@ -70,7 +70,7 @@ class OutputTest(unittest.TestCase):
             '&112000000012345 '
             '&113K'
             '&13203'
-            '&1330012345678'
+            '&13312345678'
         )
 
     def test_writer_invalid_input(self):

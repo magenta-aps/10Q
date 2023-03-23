@@ -287,7 +287,7 @@ class G69TransactionWriter(object):
         'betaling_modtager_nrkode': (130, 2, int, False, True),
         'betaling_modtager': (131, 10, int, False, True),
         'ydelse_modtager_nrkode': (132, 2, int, False, True),
-        'ydelse_modtager': (133, 10, int, False, True),
+        'ydelse_modtager': (133, 10, str, False, False),
         'oplysningspligtig_nrkode': (134, 2, int, False, True),
         'oplysningspligtig': (135, 10, int, False, True),
         'oplysningspligt_kode': (136, 1, str, False, False),
@@ -425,6 +425,8 @@ class G69TransactionWriter(object):
                 if type(value) != required_type:
                     if required_type == Decimal and type(value) == int:
                         value = Decimal(value)
+                    elif required_type == str and type(value) == int:
+                        value = str(value)
                     else:
                         raise ValueError(f"{name}={value} must be of type {required_type}")
                 if required_type == int:
