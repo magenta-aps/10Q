@@ -133,6 +133,7 @@ class TenQFixWidthFieldLineTransactionType26(TenQTransaction):
         ('individ_type', 2, '20'),  # Hardcoded to 20 according to spec
         ('rate_nummer', 3, '999'),  # Hardcoded to 999 according to spec
         ('line_number', 3, None),
+        ('rate_text', 60, ''),
     )
     trans_type = 26
 
