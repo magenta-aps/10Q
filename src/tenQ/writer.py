@@ -37,6 +37,10 @@ class TenQTransaction(dict):
             pos += length
         return data
 
+    @property
+    def serialize_fields(self):
+        return self.fieldspec
+
     def serialize_transaction(self, **kwargs):
 
         data = {**self}
@@ -47,7 +51,7 @@ class TenQTransaction(dict):
 
         fields = []
 
-        for field_name, width, _ in self.fieldspec:
+        for field_name, width, _ in self.serialize_fields:
             value = data[field_name]
 
             if value is None:
@@ -137,15 +141,17 @@ class TenQFixWidthFieldLineTransactionType26(TenQTransaction):
     )
     trans_type = 26
 
+    @property
+    def serialize_fields(self):
+        return self.fieldspec[0:-1]
+
     # Special case for field 'rate_text': This field should be appended at the end and not
     # right justified with max. 60 characters.
-
     def serialize_transaction(self, **kwargs):
         line = super(
             TenQFixWidthFieldLineTransactionType26, self
         ).serialize_transaction(**kwargs)
         line += kwargs['rate_text'][:60]
-
         return line
 
 
