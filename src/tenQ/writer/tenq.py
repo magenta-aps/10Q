@@ -11,7 +11,6 @@ from tenQ.dates import get_last_payment_date_from_due_date
 # Uses KMD GE550010Q v 15
 # Eller se online dokumentation https://aka.nanoq.gl/etaxOIO/FileFormats/Prisme/10Q.aspx
 class TenQTransaction(dict):
-
     fieldspec = (
         ("leverandoer_ident", 4, None),
         ("trans_type", 2, None),
@@ -48,7 +47,6 @@ class TenQTransaction(dict):
         return self.fieldspec
 
     def serialize_transaction(self, **kwargs):
-
         data = {**self}
         data.update(kwargs)
 
@@ -103,7 +101,7 @@ class TenQTransaction(dict):
 
 
 class TenQFixWidthFieldLineTransactionType10(TenQTransaction):
-    fieldspec = TenQTransaction.fieldspec + tuple([("person_nummer", 10, None)])
+    fieldspec = TenQTransaction.fieldspec + (("person_nummer", 10, None),)
     trans_type = 10
 
 
@@ -160,11 +158,16 @@ class TenQFixWidthFieldLineTransactionType26(TenQTransaction):
         return line
 
 
-class TenQTransactionWriter(object):
+class TenQFixWidthFieldLineTransactionType52(TenQTransaction):
+    fieldspec = TenQTransaction.fieldspec + (("ean_lokationsnummer", 13, None),)
+    trans_type = 52
 
+
+class TenQTransactionWriter(object):
     transaction_10 = None
     transaction_24 = None
     transaction_26 = None
+    transaction_52 = None
     transaction_list = ""
 
     def __init__(
@@ -183,6 +186,7 @@ class TenQTransactionWriter(object):
         opkraev_date: date = None,
         interest_date: date = None,
         omraade_nummer: int = None,
+        ean_lokationsnummer: str = None,
     ):
         if timestamp is None:
             timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -225,16 +229,19 @@ class TenQTransactionWriter(object):
             "faktura_no": faktura_no,
             "bruger_nummer": bruger_nummer,
             "betal_art": betal_art,
+            "ean_lokationsnummer": ean_lokationsnummer,
         }
 
         self.transaction_10 = TenQFixWidthFieldLineTransactionType10(**init_data)
         self.transaction_24 = TenQFixWidthFieldLineTransactionType24(**init_data)
         self.transaction_26 = TenQFixWidthFieldLineTransactionType26(**init_data)
+        self.transaction_52 = TenQFixWidthFieldLineTransactionType52(**init_data)
 
         self.transaction_map = {
             "10": self.transaction_10,
             "24": self.transaction_24,
             "26": self.transaction_26,
+            "52": self.transaction_52,
         }
 
     def parse(self, text):
@@ -257,6 +264,7 @@ class TenQTransactionWriter(object):
         belob_type: int = 1,
         rentefri_beloeb: int = 0,
         opkraev_kode: int = 1,
+        ean_lokationsnummer: str = "",
     ):
         data = {
             "cpr_nummer": cpr_nummer,
@@ -270,6 +278,7 @@ class TenQTransactionWriter(object):
             "belob_type": belob_type,
             "rentefri_beloeb": TenQTransaction.format_amount(rentefri_beloeb),
             "opkraev_kode": opkraev_kode,
+            "ean_lokationsnummer": ean_lokationsnummer,
         }
         # Initial two lines
         result_lines = [
@@ -283,7 +292,8 @@ class TenQTransactionWriter(object):
                     line_number=str(line_nr).rjust(3, "0"), rate_text=line, **data
                 ),
             )
-
+        if ean_lokationsnummer:
+            result_lines.append(self.transaction_52.serialize_transaction(**data))
         return "\r\n".join(result_lines)
 
 
