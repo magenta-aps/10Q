@@ -24,7 +24,7 @@ class G69TransactionWriter(object):
             "maskinnr": (103, 5, int, True, True),
             "eks_løbenr": (104, 7, int, True, True),
             "post_dato": (110, 8, date, True, True),
-            "kontonr": (111, 15, int, True, True),
+            "kontonr": (111, 40, int, True, 15),
             "beløb": (112, 13, Decimal, True, True),
             "deb_kred": (113, 1, str, True, False),
             "regnskabsår": (114, 4, int, False, True),
@@ -204,7 +204,12 @@ class G69TransactionWriter(object):
                         f"Value {name}={value} may not exceed length {width}"
                     )
                 if pad:
-                    value = value.rjust(width, "0")
+                    if isinstance(pad, bool):
+                        # `pad` is True - use `width` to set the padding
+                        value = value.rjust(width, "0")
+                    else:
+                        # `pad` is an int - use `pad` to set the padding
+                        value = value.rjust(pad, "0")
                 code = str(code).rjust(3, "0")
                 output.append(f"{code}{value}")
         self.line_number += 1
