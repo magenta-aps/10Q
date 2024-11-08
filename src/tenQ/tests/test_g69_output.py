@@ -133,12 +133,12 @@ class OutputTest(unittest.TestCase):
     def test_field_111_allows_values_longer_than_15_digits(self):
         # Act: pass a 40-digit value as `kontonr` (= field 111)
         transaction = self.transaction_writer.serialize_transaction(
-            **{**self.minimum_required, **{"kontonr": int("1" * 40)}}
+            **{**self.minimum_required, **{"kontonr": int("1" * 50)}}
         )
         # Assert: field 111 is not padded
         self.assertEqual(
             self._get_floating_field_value(transaction, 111),
-            "1" * 40,
+            "1" * 50,
         )
 
     def test_field_111_pads_shorter_values_to_15_characters(self):
