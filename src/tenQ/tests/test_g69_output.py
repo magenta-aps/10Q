@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2024 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
-
+import re
 import unittest
 from datetime import date
 from decimal import Decimal
@@ -129,3 +129,30 @@ class OutputTest(unittest.TestCase):
             self.transaction_writer.serialize_transaction(
                 **{**self.minimum_required, **subject}
             )
+
+    def test_field_111_allows_values_longer_than_15_digits(self):
+        # Act: pass a 40-digit value as `kontonr` (= field 111)
+        transaction = self.transaction_writer.serialize_transaction(
+            **{**self.minimum_required, **{"kontonr": int("1" * 40)}}
+        )
+        # Assert: field 111 is not padded
+        self.assertEqual(
+            self._get_floating_field_value(transaction, 111),
+            "1" * 40,
+        )
+
+    def test_field_111_pads_shorter_values_to_15_characters(self):
+        # Act: pass a 10-digit value as `kontonr` (= field 111)
+        transaction = self.transaction_writer.serialize_transaction(
+            **{**self.minimum_required, **{"kontonr": int("1" * 10)}}
+        )
+        # Assert: field 111 is padded out to 15 characters
+        self.assertEqual(
+            self._get_floating_field_value(transaction, 111),
+            "000001111111111",
+        )
+
+    def _get_floating_field_value(self, transaction: str, field: int) -> str:
+        match = re.match(rf".*&{field}(?P<val>\d+)&.*", transaction)
+        self.assertIsNotNone(match)
+        return match.groupdict()["val"]
