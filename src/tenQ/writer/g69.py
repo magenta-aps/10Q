@@ -100,7 +100,7 @@ class G69TransactionWriter(object):
         "is_cvr": {"field": "ydelse_modtager_nrkode", "map": {False: 2, True: 3}},
         "is_kontering_fakturapulje": {
             "field": "kontering_fakturapulje",
-            map: {False: "N", True: "J"},
+            "map": {False: "N", True: "J"},
         },
         "is_debet": {"field": "deb_kred", "map": {False: "K", True: "D"}},
         "is_kredit": {"field": "deb_kred", "map": {False: "D", True: "K"}},
