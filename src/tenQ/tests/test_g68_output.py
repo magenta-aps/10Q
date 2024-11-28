@@ -321,6 +321,7 @@ class TestG8TransactionWriter(TestCase):
             1234,
             date(2020, 1, 27),
             date(2020, 2, 1),
+            "012345678",  # fakturanummer
             "Denne måneds udbetaling af beskæftigelsestilskud "
             "sker ud fra en forventet samlet årsindkomst på 324.178 kr. "
             "og er baseret på din A- og B-indkomst i 2023.",
@@ -329,6 +330,7 @@ class TestG8TransactionWriter(TestCase):
             transaction_serialized,
             "000G6800001011&020000&0300&07000000000000000000&0800000123400&09+"
             "&1002&1100000101012222&1220200127&16202002010000000001"
+            "&17012345678"  # serialized fakturanummer
             "&40Denne måneds udbetaling af beskæftigelsestilskud sker ud fra en forventet samlet "
             "&41årsindkomst på 324.178 kr. og er baseret på din A- og B-indkomst i 2023.",
         )
