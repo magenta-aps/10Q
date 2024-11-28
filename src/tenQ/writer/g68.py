@@ -360,6 +360,11 @@ class Posteringshenvisning(FloatingFieldMixin, StringField):
         return cls(posting_date, machine_id, line_no)
 
 
+class Fakturanummer(FloatingFieldMixin, StringField):
+    id = 17
+    length = 20
+
+
 class BetalingstekstLinje(FloatingFieldMixin, StringField):
     length = 81
     id = 40
@@ -418,6 +423,7 @@ class G68TransactionWriter:
         amount: int,
         payment_date: date,
         posting_date: date,
+        invoice_no: str,
         text: str,
     ) -> str:
         transaction = G68Transaction(
@@ -428,6 +434,7 @@ class G68TransactionWriter:
             Udbetalingsbeløb(amount),
             Udbetalingsdato(payment_date),
             Posteringsdato(posting_date),
+            Fakturanummer(invoice_no),
             BetalingstekstLinje.list_from_text(text),
         )
         self._line_no += 1
@@ -444,6 +451,7 @@ class G68Transaction(Serializable):
         amount: Udbetalingsbeløb,
         payment_date: Udbetalingsdato,
         posting_date: Posteringsdato,
+        invoice_no: Fakturanummer,
         text: List[BetalingstekstLinje],
     ):
         self._writer = writer
@@ -468,6 +476,7 @@ class G68Transaction(Serializable):
         self.amount = amount
         self.payment_date = payment_date
         self.posting_date = posting_date
+        self.invoice_no = invoice_no
         self.text = text
 
     @property
@@ -500,6 +509,7 @@ class G68Transaction(Serializable):
             self.recipient,
             self.payment_date,
             self.posting_reference,
+            self.invoice_no,
             *self.text,
         ]
         FloatingFieldMixin.validate_required_fields(fields)
