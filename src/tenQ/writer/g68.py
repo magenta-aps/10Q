@@ -4,7 +4,6 @@
 from datetime import date, datetime
 from enum import Enum
 from operator import attrgetter
-from textwrap import wrap
 from typing import Generator, List, Optional, Type, Union
 
 _not_implemented = NotImplementedError("must be implemented by subclass")
@@ -385,17 +384,12 @@ class BetalingstekstLinje(FloatingFieldMixin, StringField):
         """Create zero or more `BetalingstekstLinje` instances from string `text`.
         Each `BetalingstekstLinje` has an ID between 40 and 75.
         """
+        lines: list[str] = text.splitlines()
+        assert len(lines) <= (cls._max_id - cls._min_id) + 1
+        assert max(len(line) for line in lines) <= cls.length
         return [
             cls(line, field_id)
-            for field_id, line in enumerate(
-                wrap(
-                    text,
-                    width=cls.length,
-                    max_lines=(cls._max_id - cls._min_id) + 1,
-                    drop_whitespace=False,
-                ),
-                start=cls._min_id,
-            )
+            for field_id, line in enumerate(lines, start=cls._min_id)
         ]
 
 

@@ -293,22 +293,23 @@ class TestBetalingstekstLinje(TestCase):
     def test_list_from_text(self):
         cls = BetalingstekstLinje
         instances: List[BetalingstekstLinje] = cls.list_from_text(
-            # Very long text (more than 100 lines of 81 characters each)
-            "abc 123 foo"
-            * 1000
+            # 35 lines of 81 characters each, separated by line breaks
+            "\n".join(["a" * 81] * 35)
         )
         # Assert that a maximum of 35 lines are produced
-        self.assertEqual(len(instances), (cls._max_id - cls._min_id) + 1)
+        self.assertEqual(len(instances), (cls._max_id - cls._min_id))
         # Assert that each line is no longer than 81 characters
         self.assertTrue(all(len(instance.val) <= cls.length for instance in instances))
         # Assert that each line has a sequential ID, beginning at 40
         self.assertEqual(
             [instance.id for instance in instances],
-            list(range(cls._min_id, cls._max_id + 1)),
+            list(range(cls._min_id, cls._max_id)),
         )
 
 
 class TestG8TransactionWriter(TestCase):
+    maxDiff = None
+
     def setUp(self):
         super().setUp()
         self.writer = G68TransactionWriter(0, 0)
@@ -322,8 +323,8 @@ class TestG8TransactionWriter(TestCase):
             date(2020, 1, 27),
             date(2020, 2, 1),
             "012345678",  # fakturanummer
-            "Denne måneds udbetaling af beskæftigelsestilskud "
-            "sker ud fra en forventet samlet årsindkomst på 324.178 kr. "
+            "Denne måneds udbetaling af beskæftigelsestilskud\n"
+            "sker ud fra en forventet samlet årsindkomst på 324.178 kr.\n"
             "og er baseret på din A- og B-indkomst i 2023.",
         )
         self.assertEqual(
@@ -331,8 +332,9 @@ class TestG8TransactionWriter(TestCase):
             "000G6800001011&020000&0300&07000000000000000000&0800000123400&09+"
             "&1002&1100000101012222&1220200127&16202002010000000001"
             "&17012345678"  # serialized fakturanummer
-            "&40Denne måneds udbetaling af beskæftigelsestilskud sker ud fra en forventet samlet "
-            "&41årsindkomst på 324.178 kr. og er baseret på din A- og B-indkomst i 2023.",
+            "&40Denne måneds udbetaling af beskæftigelsestilskud"
+            "&41sker ud fra en forventet samlet årsindkomst på 324.178 kr."
+            "&42og er baseret på din A- og B-indkomst i 2023.",
         )
 
 
