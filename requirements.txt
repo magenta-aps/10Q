@@ -1,4 +1,4 @@
-pysftp==0.2.9
 openpyxl==3.0.9
 coverage==7.3.0
 pytest==8.3.2
+paramiko==4.0.0

@@ -7,11 +7,11 @@ from typing import Callable
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
-from paramiko.ssh_exception import SSHException
-from pysftp.exceptions import (
-    ConnectionException,
-    CredentialException,
-    HostKeysException,
+from paramiko.ssh_exception import (
+    AuthenticationException,
+    BadHostKeyException,
+    NoValidConnectionsError,
+    SSHException,
 )
 
 from tenQ.client import (
@@ -26,22 +26,22 @@ _port = 22
 
 
 class TestGetConnection(TestCase):
-    def test_returns_pysftp_connection(self):
+    def test_returns_paramiko_connection(self):
         for known_hosts in (None, ["a_hostname"]):
             with self.subTest(known_hosts=known_hosts):
                 # Arrange
-                mock_cnopts = MagicMock()
+                mock_hostkeys = MagicMock()
                 mock_conn = MagicMock()
-                with patch("tenQ.client.pysftp.CnOpts", return_value=mock_cnopts):
-                    with patch("tenQ.client.pysftp.Connection", new=mock_conn):
+                with patch("tenQ.client.paramiko.HostKeys.clear", new=mock_hostkeys):
+                    with patch("tenQ.client.paramiko.SSHClient.connect", new=mock_conn):
                         # Act
                         _get_connection(
                             self._get_mock_settings(known_hosts=known_hosts)
                         )
-                        # Assert: `pysftp.CnOpts` is initialized as expected
+                        # Assert: ssh_client hostkeys have been cleared
                         if known_hosts is None:
-                            self.assertIsNone(mock_cnopts.hostkeys)
-                        # Assert: `pysftp.Connection.__init__` is called as expected
+                            mock_hostkeys.assert_called_once()
+                        # Assert: `paramiko.SSHClient.connect` is called as expected
                         mock_conn.assert_called_once_with(
                             "host",
                             username="username",
@@ -67,21 +67,21 @@ class ClientTestCase(TestCase):
 
     def assert_exceptions_are_converted(self, callable: Callable) -> None:
         def raise_connection_exception(*args):
-            raise ConnectionException("host", _port)
+            raise NoValidConnectionsError({"host": _port})
 
         def raise_credential_exception(*args):
-            raise CredentialException("message")
+            raise AuthenticationException("message")
 
         known = (
             # `ftplib` exceptions
             list(all_ftp_errors)
             # `paramiko.ssh_exception` exceptions (base class)
             + [SSHException]
-            # `pysftp.exceptions` exceptions
+            # `paramiko` exceptions for connection
             + [
                 raise_connection_exception,
                 raise_credential_exception,
-                HostKeysException,
+                BadHostKeyException,
             ]
         )
         for exception in known:
