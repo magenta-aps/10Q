@@ -45,21 +45,32 @@ def exception_handler():
 
 
 @contextmanager
-def _get_connection(settings: dict) -> SFTPClient:
-    ssh_client = SSHClient()
+def _get_connection(settings: dict, ssh_client: SSHClient|None = None) -> SFTPClient:
+    if ssh_client is None:
+        ssh_client = SSHClient()
     ssh_client.load_system_host_keys()
 
     """
-    The old function here is not well understood by the author, and does not seem to
-    be in use in any production nor test systems, and has thus been replaced by a
-    placeholder statement:
-
-    cnopts = pysftp.CnOpts(settings["known_hosts"])
-    if settings["known_hosts"] is None:
-        cnopts.hostkeys = None
+    Known host keys should be added as a list of dicts, to fit the add function
+    (https://docs.paramiko.org/en/3.3/api/hostkeys.html#paramiko.hostkeys.HostKeys):
+    [
+        {
+            "hostname": "hostname1",
+            "keytype": "keytype1",
+            "key": "key1",
+        },
+        {
+            "hostname": "hostname2",
+            "keytype": "keytype2",
+            "key": "key2",
+        },
+    ]
     """
-    if settings["known_hosts"] is None:
-        hostkeys = ssh_client.get_host_keys()
+    hostkeys = ssh_client.get_host_keys()
+    if settings["known_hosts"]:
+        for key in known_hosts:
+            hostkeys.add(key["hostname"], key["keytype"], key["key"])
+    else:
         hostkeys.clear()
 
     ssh_client.connect(
