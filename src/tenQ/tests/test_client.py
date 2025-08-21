@@ -30,6 +30,7 @@ from tenQ.client import (
 
 _port = 22
 
+
 class SSHClientMock(MagicMock):
     def __init__(self, **kwargs):
         super().__init__(spec=SSHClient, **kwargs)
@@ -39,26 +40,29 @@ class SSHClientMock(MagicMock):
 
     def __exit__(self):
         pass
-    
-    def connect(self, hostname, username=None, password=None,port=None):
+
+    def connect(self, hostname, username=None, password=None, port=None):
         if hostname and username and password and port:
             return None
         else:
             raise SSHException()
 
+
 class TestGetConnection(TestCase):
     def test_returns_paramiko_connection(self):
         for known_hosts in (
             [],
-            [{
-                "hostname": "a_hostname",
-                "keytype": "ssh-rsa",
-                "key": RSAKey.generate(1024),
-            }],
+            [
+                {
+                    "hostname": "a_hostname",
+                    "keytype": "ssh-rsa",
+                    "key": RSAKey.generate(1024),
+                }
+            ],
         ):
             with (
                 patch("paramiko.client.SSHClient.connect") as ssh_client_connect,
-                patch("paramiko.client.SSHClient.open_sftp") as ssh_client_open_sftp
+                patch("paramiko.client.SSHClient.open_sftp") as ssh_client_open_sftp,
             ):
                 ssh_client_connect.return_value = None
                 ssh_client_open_sftp.return_value = MagicMock()
@@ -114,7 +118,11 @@ class ClientTestCase(TestCase):
             + [
                 raise_connection_exception,
                 raise_credential_exception,
-                BadHostKeyException(hostname="a_hostname", got_key=RSAKey.generate(1024), expected_key=RSAKey.generate(1024)),
+                BadHostKeyException(
+                    hostname="a_hostname",
+                    got_key=RSAKey.generate(1024),
+                    expected_key=RSAKey.generate(1024),
+                ),
             ]
         )
         for exception in known:

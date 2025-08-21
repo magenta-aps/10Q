@@ -45,7 +45,7 @@ def exception_handler():
 
 
 @contextmanager
-def _get_connection(settings: dict, ssh_client: SSHClient|None = None) -> SFTPClient:
+def _get_connection(settings: dict, ssh_client: SSHClient | None = None) -> SFTPClient:
     if ssh_client is None:
         ssh_client = SSHClient()
     ssh_client.load_system_host_keys()
