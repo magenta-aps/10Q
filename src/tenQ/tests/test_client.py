@@ -5,20 +5,17 @@ import io
 from ftplib import all_errors as all_ftp_errors
 from typing import Callable
 from unittest import TestCase
-from unittest.mock import ANY, MagicMock, patch, Mock
+from unittest.mock import ANY, MagicMock, patch
 
+from paramiko.client import SSHClient
 from paramiko.hostkeys import HostKeys
-from paramiko.message import Message
-from paramiko.pkey import PKey
+from paramiko.rsakey import RSAKey
 from paramiko.ssh_exception import (
     AuthenticationException,
     BadHostKeyException,
     NoValidConnectionsError,
     SSHException,
 )
-
-from paramiko.client import SSHClient
-from paramiko.rsakey import RSAKey
 
 from tenQ.client import (
     ClientException,
