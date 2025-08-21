@@ -7,6 +7,7 @@ from typing import Callable
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch, Mock
 
+from paramiko.hostkeys import HostKeys
 from paramiko.message import Message
 from paramiko.pkey import PKey
 from paramiko.ssh_exception import (
@@ -53,17 +54,34 @@ class TestGetConnection(TestCase):
                 "hostname": "a_hostname",
                 "keytype": "ssh-rsa",
                 "key": RSAKey.generate(1024),
-            }]
+            }],
+        ):
+            with (
+                patch("paramiko.client.SSHClient.connect") as ssh_client_connect,
+                patch("paramiko.client.SSHClient.open_sftp") as ssh_client_open_sftp
             ):
-            with self.subTest(known_hosts=known_hosts):
-                # Arrange
-                # Act
-                # TODO: Mock away the SSHClient and SFTPClient....
-                # If Mock/MagicMock ever fucking worked...
-                with _get_connection(
-                    self._get_mock_settings(known_hosts=known_hosts)
-                ) as client:
-                    print(dir(client))
+                ssh_client_connect.return_value = None
+                ssh_client_open_sftp.return_value = MagicMock()
+
+                with self.subTest(known_hosts=known_hosts):
+                    with SSHClient() as ssh_client:
+                        with _get_connection(
+                            settings=self._get_mock_settings(known_hosts=known_hosts),
+                            ssh_client=ssh_client,
+                        ):
+                            hostkeys: HostKeys = ssh_client.get_host_keys()
+                            self.assertEqual(len(hostkeys), len(known_hosts))
+                            for host in known_hosts:
+                                self.assertIn(host["hostname"], hostkeys.keys())
+                                subdict = hostkeys.get(host["hostname"])
+                                self.assertEqual(subdict["ssh-rsa"], host["key"])
+                ssh_client_open_sftp.assert_called_once()
+                ssh_client_connect.assert_called_once_with(
+                    "host",
+                    username="username",
+                    password="password",
+                    port=_port,
+                )
 
     def _get_mock_settings(self, **kwargs) -> dict:
         settings = dict(
