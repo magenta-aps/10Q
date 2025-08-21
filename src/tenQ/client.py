@@ -68,7 +68,7 @@ def _get_connection(settings: dict, ssh_client: SSHClient|None = None) -> SFTPCl
     """
     hostkeys = ssh_client.get_host_keys()
     if settings["known_hosts"]:
-        for key in known_hosts:
+        for key in settings["known_hosts"]:
             hostkeys.add(key["hostname"], key["keytype"], key["key"])
     else:
         hostkeys.clear()

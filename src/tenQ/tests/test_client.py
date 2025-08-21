@@ -7,6 +7,8 @@ from typing import Callable
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch, Mock
 
+from paramiko.message import Message
+from paramiko.pkey import PKey
 from paramiko.ssh_exception import (
     AuthenticationException,
     BadHostKeyException,
@@ -94,7 +96,7 @@ class ClientTestCase(TestCase):
             + [
                 raise_connection_exception,
                 raise_credential_exception,
-                BadHostKeyException,
+                BadHostKeyException(hostname="a_hostname", got_key=RSAKey.generate(1024), expected_key=RSAKey.generate(1024)),
             ]
         )
         for exception in known:
