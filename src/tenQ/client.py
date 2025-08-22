@@ -7,8 +7,14 @@ from ftplib import all_errors as all_ftp_errors
 from io import BytesIO, IOBase
 from typing import Callable, List
 
-import pysftp
-from paramiko.ssh_exception import SSHException
+from paramiko.client import SSHClient
+from paramiko.sftp_client import SFTPClient
+from paramiko.ssh_exception import (
+    AuthenticationException,
+    BadHostKeyException,
+    NoValidConnectionsError,
+    SSHException,
+)
 
 
 class ClientException(Exception):
@@ -30,27 +36,55 @@ def exception_handler():
     except SSHException as e:
         # Handle `paramiko.ssh_exception` exceptions
         raise ClientException(str(e)) from e
-    except (
-        pysftp.ConnectionException,
-        pysftp.CredentialException,
-        pysftp.HostKeysException,
+    except (  # handle similar exceptions from Paramiko
+        NoValidConnectionsError,
+        AuthenticationException,
+        BadHostKeyException,
     ) as e:
-        # Handle other exceptions possibly raised by `pysftp.Connection.__init__`
         raise ClientException(str(e)) from e
 
 
-def _get_connection(settings: dict) -> pysftp.Connection:
-    cnopts = pysftp.CnOpts(settings["known_hosts"])
-    if settings["known_hosts"] is None:
-        cnopts.hostkeys = None
+@contextmanager
+def _get_connection(settings: dict, ssh_client: SSHClient | None = None) -> SFTPClient:
+    if ssh_client is None:
+        ssh_client = SSHClient()
+    ssh_client.load_system_host_keys()
 
-    return pysftp.Connection(
+    """
+    Known host keys should be added as a list of dicts, to fit the add function
+    (https://docs.paramiko.org/en/3.3/api/hostkeys.html#paramiko.hostkeys.HostKeys):
+    [
+        {
+            "hostname": "hostname1",
+            "keytype": "keytype1",
+            "key": "key1",
+        },
+        {
+            "hostname": "hostname2",
+            "keytype": "keytype2",
+            "key": "key2",
+        },
+    ]
+    """
+    hostkeys = ssh_client.get_host_keys()
+    if settings["known_hosts"]:
+        for key in settings["known_hosts"]:
+            hostkeys.add(key["hostname"], key["keytype"], key["key"])
+    else:
+        hostkeys.clear()
+
+    ssh_client.connect(
         settings["host"],
         username=settings["username"],
         password=settings["password"],
         port=settings.get("port", 22),
-        cnopts=cnopts,
     )
+    sftp_client = ssh_client.open_sftp()
+    try:
+        yield sftp_client
+    finally:
+        sftp_client.close()
+        ssh_client.close()
 
 
 def put_file_in_prisme_folder(
