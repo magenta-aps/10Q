@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-FROM python:3.8
+FROM python:3.12
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
