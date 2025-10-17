@@ -2,12 +2,14 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import os
+from base64 import decodebytes
 from contextlib import contextmanager
 from ftplib import all_errors as all_ftp_errors
 from io import BytesIO, IOBase
-from typing import Callable, List
+from typing import Callable, List, Optional
 
-from paramiko.client import SSHClient
+from paramiko import PKey
+from paramiko.client import MissingHostKeyPolicy, SSHClient
 from paramiko.sftp_client import SFTPClient
 from paramiko.ssh_exception import (
     AuthenticationException,
@@ -44,11 +46,23 @@ def exception_handler():
         raise ClientException(str(e)) from e
 
 
+class TenQHostKeyPolicy(MissingHostKeyPolicy):
+    def missing_host_key(self, client, hostname, key: PKey):
+        raise SSHException(
+            f"Missing host key for {hostname}, obtained from server: "
+            f"(name={key.get_name()}, value: {key.get_base64()}), "
+            f"please add to config"
+        )
+
+
 @contextmanager
-def _get_connection(settings: dict, ssh_client: SSHClient | None = None) -> SFTPClient:
+def _get_connection(
+    settings: dict, ssh_client: Optional[SSHClient] = None
+) -> SFTPClient:
     if ssh_client is None:
         ssh_client = SSHClient()
     ssh_client.load_system_host_keys()
+    ssh_client.set_missing_host_key_policy(TenQHostKeyPolicy())
 
     """
     Known host keys should be added as a list of dicts, to fit the add function
@@ -67,9 +81,13 @@ def _get_connection(settings: dict, ssh_client: SSHClient | None = None) -> SFTP
     ]
     """
     hostkeys = ssh_client.get_host_keys()
+
     if settings["known_hosts"]:
-        for key in settings["known_hosts"]:
-            hostkeys.add(key["hostname"], key["keytype"], key["key"])
+        for host_config in settings["known_hosts"]:
+            key_base64 = host_config["key"].encode("ascii")
+            key_bytes = decodebytes(key_base64)
+            pkey = PKey.from_type_string(host_config["keytype"], key_bytes)
+            hostkeys.add(host_config["hostname"], pkey.get_name(), pkey)
     else:
         hostkeys.clear()
 
@@ -79,6 +97,7 @@ def _get_connection(settings: dict, ssh_client: SSHClient | None = None) -> SFTP
         password=settings["password"],
         port=settings.get("port", 22),
     )
+
     sftp_client = ssh_client.open_sftp()
     try:
         yield sftp_client

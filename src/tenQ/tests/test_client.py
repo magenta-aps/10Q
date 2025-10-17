@@ -53,7 +53,7 @@ class TestGetConnection(TestCase):
                 {
                     "hostname": "a_hostname",
                     "keytype": "ssh-rsa",
-                    "key": RSAKey.generate(1024),
+                    "key": RSAKey.generate(1024).get_base64(),
                 }
             ],
         ):
@@ -75,7 +75,9 @@ class TestGetConnection(TestCase):
                             for host in known_hosts:
                                 self.assertIn(host["hostname"], hostkeys.keys())
                                 subdict = hostkeys.get(host["hostname"])
-                                self.assertEqual(subdict["ssh-rsa"], host["key"])
+                                self.assertEqual(
+                                    subdict["ssh-rsa"].get_base64(), host["key"]
+                                )
                 ssh_client_open_sftp.assert_called_once()
                 ssh_client_connect.assert_called_once_with(
                     "host",
